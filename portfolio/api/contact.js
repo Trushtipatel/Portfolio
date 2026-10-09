@@ -62,7 +62,7 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           from: {
-            email: "website@trushti.space",
+            email: "pateltrushtiv@gmail.com",
             name: "Trushti Portfolio"
           },
           to: [{ email: recipient }],
