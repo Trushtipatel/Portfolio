@@ -53,7 +53,7 @@ export async function onRequestPost({ request, env }) {
       },
       body: JSON.stringify({
         from: {
-          email: "website@trushti.space",
+          email: "pateltrushtiv@gmail.com",
           name: "Trushti Portfolio"
         },
         to: [{ email: env.CONTACT_TO_EMAIL }],
