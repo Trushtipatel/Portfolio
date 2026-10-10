@@ -1,82 +1,35 @@
+const contactForm = document.querySelector("#contact-form");
 
-export async function onRequestPost({ request, env }) {
-  const json = (data, status = 200) =>
-    new Response(JSON.stringify(data), {
-      status,
-      headers: { "Content-Type": "application/json" }
-    });
+if (contactForm) {
+  const status = document.querySelector("#contact-status");
+  const submitButton = document.querySelector("#contact-submit");
 
-  let body;
+  contactForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    status.textContent = "Sending your message...";
+    submitButton.disabled = true;
 
-  try {
-    body = await request.json();
-  } catch {
-    return json({ success: false, error: "Invalid request." }, 400);
-  }
+    const fields = Object.fromEntries(new FormData(contactForm).entries());
 
-  const { name, email, message, website } = body || {};
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields)
+      });
+      const result = await response.json();
 
-  // Honeypot: silently ignore automated spam.
-  if (website) {
-    return json({ success: true });
-  }
+      if (!response.ok || !result.success) {
+        status.textContent = result.error || "Your message could not be sent.";
+        return;
+      }
 
-  if (
-    typeof name !== "string" ||
-    typeof email !== "string" ||
-    typeof message !== "string" ||
-    !name.trim() ||
-    !email.trim() ||
-    !message.trim() ||
-    name.length > 100 ||
-    email.length > 254 ||
-    message.length > 5000
-  ) {
-    return json({ success: false, error: "Please check all fields." }, 400);
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-    return json({ success: false, error: "Enter a valid email address." }, 400);
-  }
-
-  if (!env.MAILERSEND_API_KEY || !env.CONTACT_TO_EMAIL) {
-    console.error("Missing required email configuration.");
-    return json({ success: false, error: "Email service is not configured." }, 500);
-  }
-
-  try {
-    const response = await fetch("https://api.mailersend.com/v1/email", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.MAILERSEND_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        from: {
-          email: "pateltrushtiv@gmail.com",
-          name: "Trushti Portfolio"
-        },
-        to: [{ email: env.CONTACT_TO_EMAIL }],
-        reply_to: {
-          email: email.trim(),
-          name: name.trim()
-        },
-        subject: "New message from trushti.space",
-        text:
-          `Name: ${name.trim()}\n` +
-          `Email: ${email.trim()}\n\n` +
-          `Message:\n${message.trim()}`
-      })
-    });
-
-    if (!response.ok) {
-      console.error("MailerSend returned status:", response.status);
-      return json({ success: false, error: "Email could not be sent." }, 502);
+      contactForm.reset();
+      status.textContent = "Thanks! Your message has been sent.";
+    } catch {
+      status.textContent = "Unable to send your message. Please try again later.";
+    } finally {
+      submitButton.disabled = false;
     }
-
-    return json({ success: true });
-  } catch (error) {
-    console.error("Email request failed:", error);
-    return json({ success: false, error: "Please try again later." }, 502);
-  }
+  });
 }

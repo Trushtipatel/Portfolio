@@ -1,6 +1,6 @@
 # Trushti Patel Portfolio
 
-This project is a static personal portfolio website for Trushti Patel, a cybersecurity professional focused on VAPT, Attack Surface Management, networking, SOC, and security testing.
+This is a portfolio website for Trushti Patel, hosted on Cloudflare Pages. Its contact form uses a Cloudflare Pages Function to send messages through MailerSend.
 
 ## 1. Project overview
 
@@ -10,14 +10,16 @@ This portfolio is designed for:
 - cybersecurity professionals reviewing technical background
 - technical interviewers checking security knowledge and work experience
 
-The website is intentionally static and suitable for GitHub Pages hosting. It contains information from the provided resume only, without adding invented certifications, tools, or projects.
+The site contains information from the provided resume only, without adding invented certifications, tools, or projects.
 
 ## 2. Technologies used
 
 - HTML5
 - CSS3
 - Vanilla JavaScript
-- GitHub Pages for static hosting
+- Cloudflare Pages for hosting
+- Cloudflare Pages Functions for the contact form
+- MailerSend for contact-form email delivery
 - SVG favicon placeholder
 - PDF resume placeholder
 
@@ -30,12 +32,14 @@ portfolio/
 │   └── style.css
 ├── js/
 │   └── script.js
+├── functions/
+│   └── api/
+│       └── contact.js
 ├── assets/
-│   ├── images/
 │   └── icons/
 │       └── favicon.svg
 ├── resume/
-│   └── Trushti-Patel-Resume.pdf
+│   └── Trushti_Resume.pdf
 ├── README.md
 ├── SECURITY.md
 ├── .gitignore
@@ -44,78 +48,46 @@ portfolio/
 
 ## 4. How to run locally
 
-From the terminal:
+Create a `.dev.vars` file in the project folder with your MailerSend settings:
 
 ```bash
-cd portfolio
-python3 -m http.server 8000
+MAILERSEND_API_KEY=your_mailersend_api_key
+CONTACT_TO_EMAIL=your_email@example.com
+MAILERSEND_FROM_EMAIL=your_verified_sender@trushti.space
 ```
 
-Then open:
-
-```text
-http://localhost:8000
-```
-
-You can also open the `index.html` file directly in a browser, but serving it through a local web server is better because it behaves more like a real website.
-
-## 5. How to upload to GitHub
-
-1. Create a GitHub account if you do not already have one.
-2. Sign in to GitHub.
-3. Click the green "New repository" button.
-4. Choose a repository name such as `trushti-portfolio`.
-5. Select "Public" for a simple GitHub Pages setup.
-6. Do not initialize the repository with a README if you already have one locally, or you can use your local files and push them to the repository.
-7. Open a terminal in the project folder and run:
+Start the local Cloudflare Pages development server:
 
 ```bash
-git init
-git add .
-git commit -m "Initial portfolio commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
-git push -u origin main
+npx wrangler pages dev .
 ```
 
-Replace the placeholder values with your actual username and repository name.
+Open the local URL printed by Wrangler. `.dev.vars` is ignored by Git; never publish your MailerSend API key.
 
-## 6. How to enable GitHub Pages
+## 5. Deploy to Cloudflare Pages
 
-After pushing your project to GitHub:
+1. Push this project to a GitHub repository.
+2. In Cloudflare, open **Workers & Pages** and create a Pages project connected to that repository.
+3. Set the project root directory to `portfolio` if the portfolio is inside a parent repository folder; otherwise leave it as `/`.
+4. Leave the build command empty and set the build output directory to `.`.
+5. Deploy the project. Cloudflare Pages detects the `functions` directory and publishes `/api/contact`.
+6. In the Pages project settings, add these bindings under **Settings → Variables and Secrets**:
+   - `MAILERSEND_API_KEY` — a secret containing your MailerSend API key
+   - `CONTACT_TO_EMAIL` — the inbox that should receive contact messages
+   - `MAILERSEND_FROM_EMAIL` — a sender address verified with MailerSend
+7. Redeploy after adding or changing the bindings.
 
-1. Open your repository on GitHub.
-2. Click the "Settings" tab.
-3. Open "Pages" in the left sidebar.
-4. Under "Source", choose the branch you want to publish, usually `main`.
-5. Select the root folder `/` or `/docs` if your site is inside a docs folder.
-6. Save the settings.
-7. GitHub will provide a live URL for your portfolio.
+The contact form runs in Cloudflare's JavaScript/Workers runtime, not a standalone Node.js server. No API key belongs in the browser code.
 
-Your site will usually be available at:
+## 6. Connect `trushti.space` from Spaceship
 
-```text
-https://YOUR_USERNAME.github.io/YOUR_REPOSITORY/
-```
+1. Add `trushti.space` as a custom domain in your Cloudflare Pages project.
+2. Add the domain to Cloudflare if prompted, then copy the Cloudflare nameservers assigned to it.
+3. In Spaceship, open the domain's nameserver settings and replace the current nameservers with the two Cloudflare nameservers.
+4. Wait for DNS activation, then return to Cloudflare Pages and confirm the custom domain is active. Add `www.trushti.space` there too if you want the `www` address.
+5. Enable or confirm HTTPS in Cloudflare.
 
-## 7. How to connect a custom domain
-
-If you want to use a custom domain:
-
-1. Buy a domain from a registrar.
-2. In your domain provider settings, create DNS records.
-3. Point the domain to GitHub Pages using the values GitHub provides.
-4. Add the custom domain in the GitHub Pages settings.
-5. Enable HTTPS when GitHub shows it as available.
-
-Typical examples include:
-
-- A record to GitHub Pages IPs
-- CNAME record for `www` pointing to your GitHub Pages URL
-
-GitHub Pages will usually give you the exact records to use.
-
-## 8. How to update the portfolio
+## 7. How to update the portfolio
 
 To update the site:
 
@@ -129,15 +101,15 @@ git commit -m "Update portfolio content"
 git push
 ```
 
-GitHub Pages will publish the newest version automatically after a short delay.
+Cloudflare Pages will publish the newest version automatically after a short delay.
 
 ## Beginner-friendly networking explanation
 
 ### GitHub repository
 A GitHub repository is just a project storage space. It stores your files online and tracks version history.
 
-### GitHub Pages
-GitHub Pages is a static hosting service from GitHub. It serves your HTML, CSS, JavaScript, and other static files to the public.
+### Cloudflare Pages
+Cloudflare Pages hosts the HTML, CSS, JavaScript, and the contact-form Function for this site.
 
 ### DNS
 DNS is the system that translates human-readable names like `example.com` into IP addresses used by computers.
@@ -149,7 +121,7 @@ A domain is the name you buy, such as `example.com` or `yourname.com`.
 A public IP is the address assigned to a machine connected to the internet. Web servers typically use a public IP so other computers can reach them.
 
 ### Web server
-A web server is software or hardware that listens for web requests and sends files back to the client. In this project, GitHub Pages acts as the web server for the static site.
+A web server is software or hardware that listens for web requests and sends files back to the client. In this project, Cloudflare Pages serves the website and contact-form Function.
 
 This is a beginner-friendly way to think about it:
 
@@ -157,11 +129,11 @@ This is a beginner-friendly way to think about it:
 - DNS = phonebook for names
 - public IP = internet address
 - web server = service that responds to requests
-- GitHub Pages = hosted static website service
+- Cloudflare Pages = hosted website and contact-form Function
 - GitHub repository = where the code is stored
 
 ## Notes
 
-- This portfolio is static and does not use a backend.
+- The contact form runs in a Cloudflare Pages Function.
 - No secrets or credentials should be added to the frontend.
 - This is meant for defensive, authorized, and professional use only.

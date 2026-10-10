@@ -601,6 +601,14 @@ form {
   gap: 16px;
 }
 
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 label {
   display: grid;
   gap: 8px;

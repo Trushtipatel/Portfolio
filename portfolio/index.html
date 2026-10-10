@@ -478,9 +478,12 @@
           </div>
 
           <div class="contact-panel">
-
-
             <form id="contact-form">
+              <label class="honeypot" aria-hidden="true">
+                Website
+                <input type="text" name="website" tabindex="-1" autocomplete="off" />
+              </label>
+
               <label>
                 Name
                 <input type="text" name="name" placeholder="Your name" maxlength="100" required />
@@ -502,7 +505,6 @@
 
               <p id="contact-status" role="status" aria-live="polite"></p>
             </form>
-
           </div>
         </div>
       </section>

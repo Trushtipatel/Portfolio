@@ -1,6 +1,6 @@
 # Security Considerations for a Public Portfolio
 
-This portfolio is a static website intended for public use. It is designed to be simple, safe, and easy to host on GitHub Pages.
+This portfolio is a public website hosted on Cloudflare Pages. Its contact form runs in a Cloudflare Pages Function.
 
 ## Important rules
 
@@ -29,7 +29,7 @@ Your portfolio is public and may be reviewed by recruiters, hiring teams, and cy
 
 ### 5. Review before publishing
 
-Before uploading to GitHub Pages or a custom domain, check:
+Before deploying to Cloudflare Pages or connecting a custom domain, check:
 
 - all links are valid
 - there are no broken image paths
