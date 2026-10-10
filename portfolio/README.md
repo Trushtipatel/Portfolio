@@ -1,6 +1,6 @@
 # Trushti Patel Portfolio
 
-This is a portfolio website for Trushti Patel, hosted on Cloudflare Pages. Its contact form uses a Cloudflare Pages Function to send messages through MailerSend.
+This is a portfolio website for Trushti Patel, hosted on Cloudflare Pages. Its contact form sends messages straight to Gmail using FormSubmit, so there is no backend, API key, or build step to manage.
 
 ## 1. Project overview
 
@@ -18,8 +18,7 @@ The site contains information from the provided resume only, without adding inve
 - CSS3
 - Vanilla JavaScript
 - Cloudflare Pages for hosting
-- Cloudflare Pages Functions for the contact form
-- MailerSend for contact-form email delivery
+- FormSubmit for contact-form email delivery
 - SVG favicon placeholder
 - PDF resume placeholder
 
@@ -32,14 +31,12 @@ portfolio/
 │   └── style.css
 ├── js/
 │   └── script.js
-├── functions/
-│   └── api/
-│       └── contact.js
 ├── assets/
 │   └── icons/
 │       └── favicon.svg
 ├── resume/
 │   └── Trushti_Resume.pdf
+├── _headers
 ├── README.md
 ├── SECURITY.md
 ├── .gitignore
@@ -48,21 +45,13 @@ portfolio/
 
 ## 4. How to run locally
 
-Create a `.dev.vars` file in the project folder with your MailerSend settings:
-
-```bash
-MAILERSEND_API_KEY=your_mailersend_api_key
-CONTACT_TO_EMAIL=your_email@example.com
-MAILERSEND_FROM_EMAIL=your_verified_sender@trushti.space
-```
-
-Start the local Cloudflare Pages development server:
+Serve the folder with any static server, or use Wrangler:
 
 ```bash
 npx wrangler pages dev .
 ```
 
-Open the local URL printed by Wrangler. `.dev.vars` is ignored by Git; never publish your MailerSend API key.
+Open the local URL printed by Wrangler. No environment variables or secrets are required; the contact form posts directly to FormSubmit.
 
 ## 5. Deploy to Cloudflare Pages
 
@@ -70,24 +59,23 @@ Open the local URL printed by Wrangler. `.dev.vars` is ignored by Git; never pub
 2. In Cloudflare, open **Workers & Pages** and create a Pages project connected to that repository.
 3. Set the project root directory to `portfolio` if the portfolio is inside a parent repository folder; otherwise leave it as `/`.
 4. Leave the build command empty and set the build output directory to `.`.
-5. Deploy the project. Cloudflare Pages detects the `functions` directory and publishes `/api/contact`.
-6. In the Pages project settings, add these bindings under **Settings → Variables and Secrets**:
-   - `MAILERSEND_API_KEY` — a secret containing your MailerSend API key
-   - `CONTACT_TO_EMAIL` — the inbox that should receive contact messages
-   - `MAILERSEND_FROM_EMAIL` — a sender address verified with MailerSend
-7. Redeploy after adding or changing the bindings.
+5. Deploy the project.
 
-The contact form runs in Cloudflare's JavaScript/Workers runtime, not a standalone Node.js server. No API key belongs in the browser code.
+No bindings, environment variables, or secrets are needed. The contact form talks to FormSubmit directly from the browser.
+
+### Activate the contact form (one time)
+
+The first time the form is submitted, FormSubmit emails a confirmation link to `pateltrushtiv@gmail.com`. Open it and click the link, then submit the form once more. After that, every submission arrives in that Gmail inbox.
 
 ### If the contact form fails
 
-1. Open the site, press **F12** (or right-click → **Inspect**), and select **Network**. Submit the contact form and select the `/api/contact` request. Note its HTTP status and response.
-2. In Cloudflare, open **Workers & Pages → your Pages project → Deployments**. Confirm the latest production deployment succeeded and its source includes `functions/api/contact.js`. If the repository has `portfolio` as a subfolder, the Pages project root must be `portfolio`.
-3. Open the Pages project’s **Functions/Logs** view and inspect the request at the same time you submit the form.
-4. If the response says email service is not configured, add `MAILERSEND_API_KEY`, `CONTACT_TO_EMAIL`, and `MAILERSEND_FROM_EMAIL` to the **Production** environment, then redeploy.
-5. If the response says email could not be sent, check the Function logs and the MailerSend account. Make sure the sender address/domain in `MAILERSEND_FROM_EMAIL` is verified with MailerSend and its required DNS records have been added.
+1. **Activate FormSubmit.** The first submission sends a one-time confirmation email to `pateltrushtiv@gmail.com`. Open it and click the activation link, then submit the form again. Until it is activated, no messages are delivered.
+2. Open the site, press **F12** (or right-click → **Inspect**), and select **Network**. Submit the form and select the `formsubmit.co` request. A successful response looks like `{"success":"true", ...}`.
+3. If the browser console shows a Content-Security-Policy or CORS error, make sure `portfolio/_headers` still lists `https://formsubmit.co` in `connect-src`.
+4. Check the Gmail **Spam** folder; the first FormSubmit message is sometimes filtered.
+5. In Cloudflare, open **Workers & Pages → your Pages project → Deployments** and confirm the latest deployment succeeded.
 
-When asking for help, share only the request's status code and the relevant error text from Cloudflare logs. Do not share API keys, passwords, or `.env`/`.dev.vars` contents.
+Free FormSubmit submissions are rate-limited and include basic spam filtering. Share only the request's status code and error text when asking for help; never share private credentials.
 
 ## 6. Connect `trushti.space` from Spaceship
 
@@ -144,6 +132,6 @@ This is a beginner-friendly way to think about it:
 
 ## Notes
 
-- The contact form runs in a Cloudflare Pages Function.
+- The contact form posts to FormSubmit and delivers messages to Gmail.
 - No secrets or credentials should be added to the frontend.
 - This is meant for defensive, authorized, and professional use only.
