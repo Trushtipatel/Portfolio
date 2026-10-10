@@ -79,6 +79,16 @@ Open the local URL printed by Wrangler. `.dev.vars` is ignored by Git; never pub
 
 The contact form runs in Cloudflare's JavaScript/Workers runtime, not a standalone Node.js server. No API key belongs in the browser code.
 
+### If the contact form fails
+
+1. Open the site, press **F12** (or right-click → **Inspect**), and select **Network**. Submit the contact form and select the `/api/contact` request. Note its HTTP status and response.
+2. In Cloudflare, open **Workers & Pages → your Pages project → Deployments**. Confirm the latest production deployment succeeded and its source includes `functions/api/contact.js`. If the repository has `portfolio` as a subfolder, the Pages project root must be `portfolio`.
+3. Open the Pages project’s **Functions/Logs** view and inspect the request at the same time you submit the form.
+4. If the response says email service is not configured, add `MAILERSEND_API_KEY`, `CONTACT_TO_EMAIL`, and `MAILERSEND_FROM_EMAIL` to the **Production** environment, then redeploy.
+5. If the response says email could not be sent, check the Function logs and the MailerSend account. Make sure the sender address/domain in `MAILERSEND_FROM_EMAIL` is verified with MailerSend and its required DNS records have been added.
+
+When asking for help, share only the request's status code and the relevant error text from Cloudflare logs. Do not share API keys, passwords, or `.env`/`.dev.vars` contents.
+
 ## 6. Connect `trushti.space` from Spaceship
 
 1. Add `trushti.space` as a custom domain in your Cloudflare Pages project.

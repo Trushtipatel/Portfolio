@@ -17,7 +17,17 @@ if (contactForm) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(fields)
       });
-      const result = await response.json();
+      const responseText = await response.text();
+      let result;
+
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        status.textContent =
+          `The contact service returned an unexpected response (HTTP ${response.status}). ` +
+          "Check the Cloudflare Pages deployment and Functions logs.";
+        return;
+      }
 
       if (!response.ok || !result.success) {
         status.textContent = result.error || "Your message could not be sent.";
@@ -27,7 +37,8 @@ if (contactForm) {
       contactForm.reset();
       status.textContent = "Thanks! Your message has been sent.";
     } catch {
-      status.textContent = "Unable to send your message. Please try again later.";
+      status.textContent =
+        "Could not reach the contact service. Check your connection and the Cloudflare Pages deployment.";
     } finally {
       submitButton.disabled = false;
     }
