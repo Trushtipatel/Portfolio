@@ -1,6 +1,6 @@
 # Trushti Patel Portfolio
 
-This is a portfolio website for Trushti Patel, hosted on Cloudflare Pages. Its contact form sends messages straight to Gmail using FormSubmit, so there is no backend, API key, or build step to manage.
+This is a portfolio website for Trushti Patel, hosted on Cloudflare Pages. Its contact form opens the visitor's email app with a prefilled message, so there is no backend, API key, or third-party service to manage.
 
 ## 1. Project overview
 
@@ -18,7 +18,6 @@ The site contains information from the provided resume only, without adding inve
 - CSS3
 - Vanilla JavaScript
 - Cloudflare Pages for hosting
-- FormSubmit for contact-form email delivery
 - SVG favicon placeholder
 - PDF resume placeholder
 
@@ -51,7 +50,7 @@ Serve the folder with any static server, or use Wrangler:
 npx wrangler pages dev .
 ```
 
-Open the local URL printed by Wrangler. No environment variables or secrets are required; the contact form posts directly to FormSubmit.
+Open the local URL printed by Wrangler. No environment variables or secrets are required; the contact form opens the visitor's email app.
 
 ## 5. Deploy to Cloudflare Pages
 
@@ -61,21 +60,14 @@ Open the local URL printed by Wrangler. No environment variables or secrets are 
 4. Leave the build command empty and set the build output directory to `.`.
 5. Deploy the project.
 
-No bindings, environment variables, or secrets are needed. The contact form talks to FormSubmit directly from the browser.
-
-### Activate the contact form (one time)
-
-The first time the form is submitted, FormSubmit emails a confirmation link to `pateltrushtiv@gmail.com`. Open it and click the link, then submit the form once more. After that, every submission arrives in that Gmail inbox.
+No bindings, environment variables, or secrets are needed. The contact form opens the visitor's email client with a prefilled message addressed to `pateltrushtiv@gmail.com`.
 
 ### If the contact form fails
 
-1. **Activate FormSubmit.** The first submission sends a one-time confirmation email to `pateltrushtiv@gmail.com`. Open it and click the activation link, then submit the form again. Until it is activated, no messages are delivered.
-2. Open the site, press **F12** (or right-click → **Inspect**), and select **Network**. Submit the form and select the `formsubmit.co` request. A successful response looks like `{"success":"true", ...}`.
-3. If the browser console shows a Content-Security-Policy or CORS error, make sure `portfolio/_headers` still lists `https://formsubmit.co` in `connect-src`.
-4. Check the Gmail **Spam** folder; the first FormSubmit message is sometimes filtered.
-5. In Cloudflare, open **Workers & Pages → your Pages project → Deployments** and confirm the latest deployment succeeded.
-
-Free FormSubmit submissions are rate-limited and include basic spam filtering. Share only the request's status code and error text when asking for help; never share private credentials.
+1. Open the site, press **F12** (or right-click → **Inspect**), and open the **Console**. Submit the form; it should open your email app with everything prefilled.
+2. If nothing opens, check that your browser allows `mailto:` links (blocked by Chrome extensions, email-only browsers, or Preview apps).
+3. If your email app shows the message in **Drafts** or asks you to confirm, send it from there — that behaviour is set by your email app, not this site.
+4. In Cloudflare, open **Workers & Pages → your Pages project → Deployments** and confirm the latest deployment succeeded.
 
 ## 6. Connect `trushti.space` from Spaceship
 
@@ -107,7 +99,7 @@ Cloudflare Pages will publish the newest version automatically after a short del
 A GitHub repository is just a project storage space. It stores your files online and tracks version history.
 
 ### Cloudflare Pages
-Cloudflare Pages hosts the HTML, CSS, JavaScript, and the contact-form Function for this site.
+Cloudflare Pages hosts the HTML and CSS for this site.
 
 ### DNS
 DNS is the system that translates human-readable names like `example.com` into IP addresses used by computers.
@@ -119,7 +111,7 @@ A domain is the name you buy, such as `example.com` or `yourname.com`.
 A public IP is the address assigned to a machine connected to the internet. Web servers typically use a public IP so other computers can reach them.
 
 ### Web server
-A web server is software or hardware that listens for web requests and sends files back to the client. In this project, Cloudflare Pages serves the website and contact-form Function.
+A web server is software or hardware that listens for web requests and sends files back to the client. In this project, Cloudflare Pages serves the website.
 
 This is a beginner-friendly way to think about it:
 
@@ -127,11 +119,11 @@ This is a beginner-friendly way to think about it:
 - DNS = phonebook for names
 - public IP = internet address
 - web server = service that responds to requests
-- Cloudflare Pages = hosted website and contact-form Function
+- Cloudflare Pages = hosted website
 - GitHub repository = where the code is stored
 
 ## Notes
 
-- The contact form posts to FormSubmit and delivers messages to Gmail.
+- The contact form opens the visitor's email client addressed to `pateltrushtiv@gmail.com`.
 - No secrets or credentials should be added to the frontend.
 - This is meant for defensive, authorized, and professional use only.
